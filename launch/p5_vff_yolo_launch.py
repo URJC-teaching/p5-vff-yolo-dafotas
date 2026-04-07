@@ -90,7 +90,7 @@ def generate_launch_description():
     
     max_linear_speed = DeclareLaunchArgument(
         'max_linear_speed',
-        default_value='1.0',
+        default_value='0.3',
         description='Maximum linear speed for robot'
     )
 
