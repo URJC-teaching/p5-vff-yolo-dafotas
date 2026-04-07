@@ -149,8 +149,8 @@ def generate_launch_description():
         executable='p5_vff_yolo_detection_node',
         name='vff_controller_yolo',
         parameters=[
-            {'max_linear_speed':max_linear_speed},
-            {'max_angular_speed':max_angular_speed}
+            {'max_linear_speed':LaunchConfiguration('max_linear_speed')},
+            {'max_angular_speed':LaunchConfiguration('max_angular_speed')}
         ]
     )
     
