@@ -117,22 +117,23 @@ class VFFControllerNode(Node):
             cmd.linear.y = 0.0
             cmd.angular.z = self.max_angular_speed
             
-        vff_x = self.attractive_vec.x 
-        vff_y = self.attractive_vec.y 
+        elif self.state == "found_person":
+                vff_x = self.attractive_vec.x 
+                vff_y = self.attractive_vec.y 
 
-        self.get_logger().info(f'VFF vector: x={vff_x:.2f}, y={vff_y:.2f}. Magnitude={math.hypot(vff_x, vff_y):.2f} Angle={math.degrees(math.atan2(vff_y, vff_x)):.2f} deg')
+                self.get_logger().info(f'VFF vector: x={vff_x:.2f}, y={vff_y:.2f}. Magnitude={math.hypot(vff_x, vff_y):.2f} Angle={math.degrees(math.atan2(vff_y, vff_x)):.2f} deg')
 
-        angle = math.atan2(vff_y, vff_x)
+                angle = math.atan2(vff_y, vff_x)
 
-        cmd.linear.x = min(self.max_linear_speed, math.hypot(vff_x, vff_y))
+                cmd.linear.x = min(self.max_linear_speed, math.hypot(vff_x, vff_y))
 
-        rotation_dir = 1.0 if angle >= 0 else -1.0 
-        # cmd.angular.z = rotation_dir * self.max_angular_speed
+                rotation_dir = 1.0 if angle >= 0 else -1.0 
+                # cmd.angular.z = rotation_dir * self.max_angular_speed
 
-        # ANGULAR_KP = 1.5 
-        # proportional_angular_speed = ANGULAR_KP * angle
-        # cmd.angular.z = max(min(angle, self.max_angular_speed), -self.max_angular_speed)
-        cmd.angular.z = rotation_dir * min(self.max_angular_speed, abs(angle))
+                # ANGULAR_KP = 1.5 
+                # proportional_angular_speed = ANGULAR_KP * angle
+                # cmd.angular.z = max(min(angle, self.max_angular_speed), -self.max_angular_speed)
+                cmd.angular.z = rotation_dir * min(self.max_angular_speed, abs(angle))
 
         self.cmd_pub.publish(cmd)
         self.get_logger().debug(f'Cmd: linear={cmd.linear.x:.2f}, angular={cmd.angular.z:.2f}')
