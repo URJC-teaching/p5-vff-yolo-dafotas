@@ -14,6 +14,8 @@ import rclpy
 from rclpy.node import Node
 from geometry_msgs.msg import Vector3, Twist
 import math
+from rclpy.duration import Duration
+import time
 
 class VFFControllerNode(Node):
     def __init__(self):
@@ -54,17 +56,26 @@ class VFFControllerNode(Node):
         self.attractive_vec = Vector3()
         #self.repulsive_vec = Vector3()
 
+        self.state = "searching"
+
+        self.time_thresh = Duration(seconds = 1.0)
+
+        self.timer = self.create_timer(0.05, self.control_loop)
+    
+    def check_person(self):
+        return (self.get_clock().now() - self.attractive_ts) <= self.time_thresh
+
     def attractive_callback(self, msg: Vector3):
         self.attractive_vec = msg
         self.get_logger().debug(f'Received Attractive vector: x={msg.x:.2f}, y={msg.y:.2f}. Magnitude={math.hypot(msg.x, msg.y):.2f}. Angle={math.degrees(math.atan2(msg.y, msg.x)):.2f} deg')
-        self.compute_and_publish_cmd()
+        self.attractive_ts = self.get_clock().now()
 #
     #def repulsive_callback(self, msg: Vector3):
     #    self.repulsive_vec = msg
     #    self.get_logger().debug(f'Received Repulsive vector: x={msg.x:.2f}, y={msg.y:.2f}. Magnitude={math.hypot(msg.x, msg.y):.2f}. Angle={math.degrees(math.atan2(msg.y, msg.x)):.2f} deg')
-    #    self.compute_and_publish_cmd()
+    #    self.control_loop()
 #
-    def compute_and_publish_cmd(self):
+    def control_loop(self):
 
         #if self.stay_distance > 0:
         #    distance = math.hypot(self.attractive_vec.x, self.attractive_vec.y)
@@ -96,7 +107,16 @@ class VFFControllerNode(Node):
 #
         #    self.get_logger().debug(f'Repulsive magnitude={math.hypot(repulsive_force_x, repulsive_force_y):.2f}. Angle={math.degrees(math.atan2(self.repulsive_vec.y, self.repulsive_vec.x)):.2f} deg')
 #
+        cmd = Twist()
 
+        if self.check_person():
+            self.state = "found_person"
+        
+        if self.state == "searching":
+            cmd.linear.x = 0.0
+            cmd.linear.y = 0.0
+            cmd.angular.z = self.max_angular_speed
+            
         vff_x = self.attractive_vec.x 
         vff_y = self.attractive_vec.y 
 
@@ -104,7 +124,6 @@ class VFFControllerNode(Node):
 
         angle = math.atan2(vff_y, vff_x)
 
-        cmd = Twist()
         cmd.linear.x = min(self.max_linear_speed, math.hypot(vff_x, vff_y))
 
         rotation_dir = 1.0 if angle >= 0 else -1.0 
