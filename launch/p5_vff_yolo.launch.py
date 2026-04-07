@@ -36,7 +36,7 @@ def generate_launch_description():
     
     imgsz_height_arg = DeclareLaunchArgument(
         'imgsz_height',
-        default_value='480',
+        default_value='480',    
         description='Altura de imagen para inferencia'
     )
     
@@ -48,19 +48,19 @@ def generate_launch_description():
     
     input_image_topic_arg = DeclareLaunchArgument(
         'input_image_topic',
-        default_value='/camera/rgb/image_raw',
+        default_value='/rgbd_camera/image',
         description='Topic de imagen de entrada'
     )
     
     input_depth_topic_arg = DeclareLaunchArgument(
         'input_depth_topic',
-        default_value='/camera/depth/image_raw',
+        default_value='/rgbd_camera/depth_image',
         description='Topic de profundidad de entrada'
     )
     
     input_depth_info_topic_arg = DeclareLaunchArgument(
         'input_depth_info_topic',
-        default_value='/camera/depth/camera_info',
+        default_value='/rgbd_camera/camera_info',
         description='Topic de info de cámara de profundidad'
     )
     
@@ -72,7 +72,7 @@ def generate_launch_description():
     
     use_3d_arg = DeclareLaunchArgument(
         'use_3d',
-        default_value='false',
+        default_value='False',
         description='Activar detección 3D'
     )
     
@@ -99,7 +99,22 @@ def generate_launch_description():
         default_value='1.0',
         description='Maximum angular speed for robot'
     )
-        
+
+    target_class = DeclareLaunchArgument(
+        'target_class',
+        default_value='cup'
+    )
+    
+    base_frame = DeclareLaunchArgument(
+        'base_frame',
+        default_value='base_footprint'
+    )
+
+    optical_frame = DeclareLaunchArgument(
+        'optical_frame',
+        default_value='camera_rgb_optical_frame'
+    )
+
     include_yolo = IncludeLaunchDescription(
         PythonLaunchDescriptionSource(
             PathJoinSubstitution([
@@ -143,6 +158,20 @@ def generate_launch_description():
             ])
         )
      )
+    include_yolo_class_detector_2d = IncludeLaunchDescription(
+        PythonLaunchDescriptionSource(
+            PathJoinSubstitution([
+                FindPackageShare('vff_control'),
+                'launch',
+                'yolo_class_2d.launch.py'
+            ])
+        ),
+        launch_arguments={
+            'target_class':LaunchConfiguration('target_class'),
+            'base_frame':LaunchConfiguration('base_frame'),
+            'optical_frame':LaunchConfiguration('optical_frame')
+        }.items()
+    )
     
     vff_controller_yolo = Node(
         package='p5_vff_yolo',
@@ -174,10 +203,14 @@ def generate_launch_description():
         namespace_arg,
         max_linear_speed,
         max_angular_speed,
+        target_class,
+        base_frame,
+        optical_frame,
         
         #Launchers
         include_yolo,
         include_yolo_2d,
+        include_yolo_class_detector_2d,
 
         #Mi nodo
         vff_controller_yolo
