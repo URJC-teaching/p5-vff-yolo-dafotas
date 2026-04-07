@@ -61,14 +61,17 @@ class VFFControllerNode(Node):
         self.time_thresh = Duration(seconds = 1.0)
 
         self.timer = self.create_timer(0.05, self.control_loop)
+
+        self.attractive_ts = self.get_clock().now()
+
     
     def check_person(self):
         return (self.get_clock().now() - self.attractive_ts) <= self.time_thresh
 
     def attractive_callback(self, msg: Vector3):
         self.attractive_vec = msg
-        self.get_logger().debug(f'Received Attractive vector: x={msg.x:.2f}, y={msg.y:.2f}. Magnitude={math.hypot(msg.x, msg.y):.2f}. Angle={math.degrees(math.atan2(msg.y, msg.x)):.2f} deg')
         self.attractive_ts = self.get_clock().now()
+        self.get_logger().debug(f'Received Attractive vector: x={msg.x:.2f}, y={msg.y:.2f}. Magnitude={math.hypot(msg.x, msg.y):.2f}. Angle={math.degrees(math.atan2(msg.y, msg.x)):.2f} deg')
 #
     #def repulsive_callback(self, msg: Vector3):
     #    self.repulsive_vec = msg

@@ -66,7 +66,7 @@ def generate_launch_description():
     
     use_tracking_arg = DeclareLaunchArgument(
         'use_tracking',
-        default_value='true',
+        default_value='True',
         description='Activar seguimiento de objetos'
     )
     
@@ -78,7 +78,7 @@ def generate_launch_description():
     
     use_debug_arg = DeclareLaunchArgument(
         'use_debug',
-        default_value='true',
+        default_value='True',
         description='Activar nodo de debug'
     )
     
@@ -151,6 +151,9 @@ def generate_launch_description():
         parameters=[
             {'max_linear_speed':LaunchConfiguration('max_linear_speed')},
             {'max_angular_speed':LaunchConfiguration('max_angular_speed')}
+        ],
+        remappings=[
+            ('/vel', '/cmd_vel'),
         ]
     )
     
