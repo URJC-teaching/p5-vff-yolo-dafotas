@@ -117,6 +117,7 @@ class VFFControllerNode(Node):
             self.state = "searching"
         
         if self.state == "searching":
+            self.attractive_vec = Vector3()
             cmd.linear.x = 0.0
             cmd.linear.y = 0.0
             cmd.angular.z = self.max_angular_speed
@@ -159,7 +160,7 @@ class VFFControllerNode(Node):
         #     timer = self.create_timer(period, _hold_publish)
 
         # Reset vectors after publishing
-        self.attractive_vec = Vector3()
+        
         # self.repulsive_vec = Vector3()
 
 def main(args=None):

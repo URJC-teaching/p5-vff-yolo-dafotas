@@ -90,19 +90,19 @@ def generate_launch_description():
     
     max_linear_speed = DeclareLaunchArgument(
         'max_linear_speed',
-        default_value='0.3',
+        default_value='0.2',
         description='Maximum linear speed for robot'
     )
 
     max_angular_speed = DeclareLaunchArgument(
         'max_angular_speed',
-        default_value='1.0',
+        default_value='0.4',
         description='Maximum angular speed for robot'
     )
 
     target_class = DeclareLaunchArgument(
         'target_class',
-        default_value='cup'
+        default_value='person'
     )
     
     base_frame = DeclareLaunchArgument(
